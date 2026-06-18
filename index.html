@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Juan Graffigna — Color Grading</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e4de;
+      --muted: rgba(232,228,222,0.45);
+      --accent: #c9a96e;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 3rem;
+      background: linear-gradient(to bottom, #0a0a0aee 0%, transparent 100%);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 4rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 40%, rgba(201,169,110,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 20% 70%, rgba(201,169,110,0.04) 0%, transparent 50%);
+    }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 10vw, 8rem);
+      font-weight: 300;
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      margin-bottom: 2rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      max-width: 400px;
+      line-height: 1.8;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2.5rem;
+      right: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .scroll-line {
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 6rem 3rem;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      max-width: 80px;
+    }
+
+    /* ── GRID ── */
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr));
+      gap: 2px;
+    }
+
+    /* ── WORK ITEM ── */
+    .work-item {
+      position: relative;
+      background: var(--surface);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .work-item-inner {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+    }
+
+    /* ── COMPARISON SLIDER ── */
+    img-comparison-slider {
+      width: 100%;
+      height: 100%;
+      display: block;
+      --divider-width: 2px;
+      --divider-color: var(--accent);
+      --handle-opacity: 0;
+    }
+
+    img-comparison-slider img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .slider-handle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider-arrows {
+      display: flex;
+      gap: 4px;
+      color: #0a0a0a;
+      font-size: 12px;
+    }
+
+    /* ── VIDEO ITEM ── */
+    .video-wrapper {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-wrapper iframe,
+    .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* ── WORK META ── */
+    .work-meta {
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-top: 1px solid var(--border);
+    }
+
+    .work-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+
+    .work-tags {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .work-tag {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+
+    .work-tag.accent {
+      color: var(--accent);
+      border-color: rgba(201,169,110,0.25);
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 2rem;
+    }
+
+    .about-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .about-body {
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 12px;
+    }
+
+    .about-body p + p { margin-top: 1rem; }
+
+    .services-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .services-list li {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    .services-list li::before {
+      content: '—';
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── CONTACT ── */
+    .contact-section {
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .contact-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 300;
+      line-height: 0.9;
+    }
+
+    .contact-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.75rem;
+    }
+
+    .contact-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .contact-link:hover { color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── FULLSCREEN OVERLAY ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.95);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.active { display: flex; }
+
+    .overlay-inner {
+      width: min(90vw, 1100px);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .overlay-close {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .overlay-close:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* ── LABEL BADGES ── */
+    .before-label, .after-label {
+      position: absolute;
+      bottom: 0.75rem;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      background: rgba(0,0,0,0.6);
+      color: var(--muted);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .before-label { left: 0.75rem; }
+    .after-label { right: 0.75rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1.25rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      .hero { padding: 2rem 1.5rem 3rem; }
+      section { padding: 4rem 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .contact-section { flex-direction: column; gap: 2rem; }
+      .contact-links { align-items: flex-start; }
+      footer { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">Juan Graffigna</a>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <p class="hero-eyebrow">Color Grading · Buenos Aires</p>
+    <h1 class="hero-title">
+      Juan<br/>
+      <em>Graffigna</em>
+    </h1>
+    <p class="hero-sub">
+      Colorista independiente. Trabajo con luz, contraste y matiz
+      para construir la atmósfera visual de cada proyecto.
+    </p>
+    <div class="hero-scroll">
+      <span class="scroll-line"></span>
+      Ver trabajos
+    </div>
+  </header>
+
+  <!-- WORK -->
+  <section id="work">
+    <p class="section-label">Trabajos</p>
+    <div class="work-grid">
+
+      <!-- 
+        =========================================================
+        INSTRUCCIONES PARA REEMPLAZAR IMÁGENES:
+        
+        Cada img-comparison-slider tiene dos imágenes:
+          slot="first"  → imagen BEFORE (sin color grading)
+          slot="second" → imagen AFTER (con color grading)
+        
+        Reemplazá el src="..." con la ruta de tu imagen.
+        Ejemplo: src="fotos/proyecto1-before.jpg"
+        
+        Para videos de YouTube, reemplazá el src del iframe:
+        src="https://www.youtube.com/embed/TU_ID_DE_VIDEO"
+        =========================================================
+      -->
+
+      <!-- ITEM 1: Foto con slider before/after -->
+      <div class="work-item">
+        <div class="work-item-inner">
+          <img-comparison-slider>
+            <img slot="first" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80" alt="Before — sin color grading" />
+            <img slot="second" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80&sat=-100&bri=10" alt="After — con color grading" />
+            <div slot="handle" class="slider-handle">
+              <div class="slider-arrows">◀ ▶</div>
+            </div>
+          </img-comparison-slider>
+          <span class="before-label">Before</span>
+          <span class="after-label">After</span>
+        </div>
+        <div class="work-meta">
+          <span class="work-title">Proyecto Paisaje</span>
+          <div class="work-tags">
+            <span class="work-tag accent">Foto</span>
+            <span class="work-tag">Natural</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITEM 2: Video de YouTube -->
+      <div class="work-item">
+        <div class="video-wrapper">
+          <!--
+            Reemplazá el ID del video. Si tu link es:
+            https://www.youtube.com/watch?v=dQw4w9WgXcQ
+            El ID es: dQw4w9WgXcQ
+            
+            Dejá el resto del src igual.
+          -->
+          <iframe
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1&color=white"
+            title="Color grading reel"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="work-meta">
+          <span class="work-title">Reel 2024</span>
+          <div class="work-tags">
+            <span class="work-tag accent">Video</span>
+            <span class="work-tag">Reel</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITEM 3: Foto con slider before/after -->
+      <div class="work-item">
+        <div class="work-item-inner">
+          <img-comparison-slider>
+            <img slot="first" src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80" alt="Before" />
+            <img slot="second" src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80&sat=50" alt="After" />
+            <div slot="handle" class="slider-handle">
+              <div class="slider-arrows">◀ ▶</div>
+            </div>
+          </img-comparison-slider>
+          <span class="before-label">Before</span>
+          <span class="after-label">After</span>
+        </div>
+        <div class="work-meta">
+          <span class="work-title">Proyecto Bosque</span>
+          <div class="work-tags">
+            <span class="work-tag accent">Foto</span>
+            <span class="work-tag">Cinematográfico</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITEM 4: Video de Vimeo -->
+      <div class="work-item">
+        <div class="video-wrapper">
+          <!--
+            Para Vimeo, si tu link es:
+            https://vimeo.com/123456789
+            El ID es: 123456789
+          -->
+          <iframe
+            src="https://player.vimeo.com/video/76979871?color=c9a96e&title=0&byline=0&portrait=0"
+            title="Color grading — cortometraje"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="work-meta">
+          <span class="work-title">Cortometraje</span>
+          <div class="work-tags">
+            <span class="work-tag accent">Video</span>
+            <span class="work-tag">Ficción</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITEM 5: Foto con slider before/after -->
+      <div class="work-item">
+        <div class="work-item-inner">
+          <img-comparison-slider>
+            <img slot="first" src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80" alt="Before" />
+            <img slot="second" src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80" alt="After" />
+            <div slot="handle" class="slider-handle">
+              <div class="slider-arrows">◀ ▶</div>
+            </div>
+          </img-comparison-slider>
+          <span class="before-label">Before</span>
+          <span class="after-label">After</span>
+        </div>
+        <div class="work-meta">
+          <span class="work-title">Proyecto Retrato</span>
+          <div class="work-tags">
+            <span class="work-tag accent">Foto</span>
+            <span class="work-tag">Editorial</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITEM 6: Video local (archivo en tu computadora) -->
+      <div class="work-item">
+        <div class="video-wrapper">
+          <!--
+            Para un video que tenés en tu computadora,
+            poné el archivo en la misma carpeta que el index.html
+            y referencialo así:
+            src="nombre-del-video.mp4"
+          -->
+          <video controls poster="">
+            <source src="tu-video.mp4" type="video/mp4" />
+            Tu navegador no soporta video.
+          </video>
+        </div>
+        <div class="work-meta">
+          <span class="work-title">Proyecto Publicidad</span>
+          <div class="work-tags">
+            <span class="work-tag accent">Video</span>
+            <span class="work-tag">Comercial</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="section-label">Sobre mí</p>
+    <div class="about-grid">
+      <div>
+        <h2 class="about-title">
+          Color que<br/>
+          <em>construye</em><br/>
+          narrativa
+        </h2>
+        <div class="about-body">
+          <!--
+            EDITÁ ESTE TEXTO con tu propia descripción.
+            Contá quién sos, cuántos años de experiencia tenés,
+            con qué tipo de proyectos trabajás, etc.
+          -->
+          <p>
+            Colorista independiente basado en Buenos Aires.
+            Trabajo en proyectos de cine, publicidad y fotografía,
+            con foco en construir una paleta coherente que sirva
+            a la historia que se quiere contar.
+          </p>
+          <p>
+            Uso DaVinci Resolve como suite principal.
+            Trabajo tanto con formatos RAW de cámara como con
+            material ya editado.
+          </p>
+          <p>
+            Disponible para proyectos remotos y presenciales.
+          </p>
+        </div>
+      </div>
+      <div>
+        <ul class="services-list">
+          <li>Color grading para video y cine</li>
+          <li>Retoque y corrección de color en fotografía</li>
+          <li>LUT personalizadas</li>
+          <li>Color matching entre cámaras</li>
+          <li>Colaboración remota</li>
+          <li>Entrega en formatos DCP, H.264, RAW</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact-section">
+    <div>
+      <h2 class="contact-title">
+        Hablemos<br/>
+        de tu <em>proyecto</em>
+      </h2>
+    </div>
+    <div class="contact-links">
+      <!--
+        REEMPLAZÁ los href con tus links reales:
+        - tu email
+        - tu Instagram
+        - tu LinkedIn (opcional)
+      -->
+      <a class="contact-link" href="mailto:hola@juangraffigna.com">
+        → hola@juangraffigna.com
+      </a>
+      <a class="contact-link" href="https://instagram.com/juangraffigna" target="_blank">
+        → @juangraffigna
+      </a>
+      <a class="contact-link" href="https://www.linkedin.com/in/juangraffigna" target="_blank">
+        → LinkedIn
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2024 Juan Graffigna</span>
+    <span>Color Grading · Buenos Aires</span>
+  </footer>
+
+</body>
+</html>
