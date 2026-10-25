@@ -161,6 +161,10 @@
     #tb button { font: 11px/1 var(--font-mono); color: #e8e4de; background: #262626; border: 1px solid #3a3a3a; padding: 7px 10px; border-radius: 3px; cursor: pointer; }
     #tb button:hover { border-color: var(--accent); }
     #tb #tbm { cursor: grab; touch-action: none; user-select: none; }
+    #guides { position: fixed; inset: 0; z-index: 340; pointer-events: none; }
+    .gl { position: fixed; background: #ff4fa3; }
+    .gv { top: 0; bottom: 0; width: 1px; }
+    .gh { left: 0; right: 0; height: 1px; }
     #tb #tbs { font: 11px var(--font-mono); color: #e8e4de; min-width: 38px; text-align: center; }
   </style>
 </head>
@@ -168,6 +172,7 @@
   <div id="app"></div>
   <div id="bar" hidden></div>
   <div id="modal" hidden></div>
+  <div id="guides"></div>
   <div id="tb" hidden><button data-t="dn" title="Achicar">A−</button><span id="tbs">100%</span><button data-t="up" title="Agrandar">A+</button><button id="tbm" title="Arrastrá para mover">✥ mover</button><button data-t="rs" title="Volver a tamaño y lugar originales">↺</button></div>
 
 <script>
@@ -473,9 +478,36 @@
       else { delete st.s; delete st.x; delete st.y; }
     });
   });
-  hm.addEventListener('pointerdown', e => { if (!cur) return; const st = C.style?.[cur.dataset.p] || {}; drag = { x0: e.clientX, y0: e.clientY, sx: st.x || 0, sy: st.y || 0 }; hm.setPointerCapture(e.pointerId); e.preventDefault(); });
-  hm.addEventListener('pointermove', e => { if (drag) upd(st => { st.x = Math.round(drag.sx + e.clientX - drag.x0); st.y = Math.round(drag.sy + e.clientY - drag.y0); }); });
-  hm.addEventListener('pointerup', () => { drag = null; });
+  /* Guías de alineación (imán). Mantené Alt apretado para mover sin imán. */
+  const SNAP = 6;
+  const rectOf = el => { const g = document.createRange(); g.selectNodeContents(el); const b = g.getBoundingClientRect(); return b.width ? b : el.getBoundingClientRect(); };
+  const snapAxis = (vals, targets) => { let best = null; for (const v of vals) for (const t of targets) { const d = t - v; if (Math.abs(d) <= SNAP && (best === null || Math.abs(d) < Math.abs(best.d))) best = { d, t }; } return best; };
+  const guides = $('#guides');
+  const drawGuides = (vx, hy) => { guides.innerHTML = (vx != null ? `<i class="gl gv" style="left:${vx}px"></i>` : '') + (hy != null ? `<i class="gl gh" style="top:${hy}px"></i>` : ''); };
+  hm.addEventListener('pointerdown', e => {
+    if (!cur) return;
+    const st = C.style?.[cur.dataset.p] || {}, r0 = rectOf(cur);
+    const xt = [innerWidth / 2], yt = [];
+    document.querySelectorAll('[data-p]').forEach(el => {
+      if (el === cur) return; const r = rectOf(el); if (!r.width || !r.height) return;
+      xt.push(r.left, r.left + r.width / 2, r.right); yt.push(r.top, r.top + r.height / 2, r.bottom);
+    });
+    drag = { x0: e.clientX, y0: e.clientY, sx: st.x || 0, sy: st.y || 0, r0, xt, yt };
+    hm.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  hm.addEventListener('pointermove', e => {
+    if (!drag) return;
+    let x = drag.sx + e.clientX - drag.x0, y = drag.sy + e.clientY - drag.y0, vx = null, hy = null;
+    if (!e.altKey) {
+      const { r0 } = drag, L = r0.left + (x - drag.sx), T = r0.top + (y - drag.sy);
+      const bx = snapAxis([L, L + r0.width / 2, L + r0.width], drag.xt); if (bx) { x += bx.d; vx = bx.t; }
+      const by = snapAxis([T, T + r0.height / 2, T + r0.height], drag.yt); if (by) { y += by.d; hy = by.t; }
+    }
+    upd(st => { st.x = Math.round(x); st.y = Math.round(y); });
+    drawGuides(vx, hy);
+  });
+  const endDrag = () => { drag = null; drawGuides(null, null); };
+  hm.addEventListener('pointerup', endDrag); hm.addEventListener('pointercancel', endDrag);
   window.addEventListener('beforeunload', e => { if (editing && dirty) { e.preventDefault(); e.returnValue = ''; } });
 
   load().then(async data => {
