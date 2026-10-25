@@ -152,12 +152,23 @@
     .box input, .box select { font: 12px var(--font-mono); background: #0e0e0e; color: #e8e4de; border: 1px solid #3a3a3a; padding: 8px; border-radius: 3px; width: 100%; }
     .box input[type=color] { height: 36px; padding: 2px; }
     .box .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+
+    /* ── Tamaño y posición por texto (se guardan en content.json → "style") ── */
+    [data-p]:is(span, em, a) { display: inline-block; }
+    @media (min-width: 769px) { [data-p] { translate: var(--x, 0) var(--y, 0); } }
+    #tb { position: fixed; z-index: 350; display: flex; align-items: center; gap: 6px; padding: 6px; background: #141414; border: 1px solid var(--accent); border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,.5); }
+    #tb[hidden] { display: none; }
+    #tb button { font: 11px/1 var(--font-mono); color: #e8e4de; background: #262626; border: 1px solid #3a3a3a; padding: 7px 10px; border-radius: 3px; cursor: pointer; }
+    #tb button:hover { border-color: var(--accent); }
+    #tb #tbm { cursor: grab; touch-action: none; user-select: none; }
+    #tb #tbs { font: 11px var(--font-mono); color: #e8e4de; min-width: 38px; text-align: center; }
   </style>
 </head>
 <body>
   <div id="app"></div>
   <div id="bar" hidden></div>
   <div id="modal" hidden></div>
+  <div id="tb" hidden><button data-t="dn" title="Achicar">A−</button><span id="tbs">100%</span><button data-t="up" title="Agrandar">A+</button><button id="tbm" title="Arrastrá para mover">✥ mover</button><button data-t="rs" title="Volver a tamaño y lugar originales">↺</button></div>
 
 <script>
 (() => {
@@ -274,7 +285,34 @@
           ${editing ? `<button class="ed-btn add" data-act="addlink">+ Contacto</button>` : ''}</div>
       </section>
       <footer>${T('site.footerLeft')}${T('site.footerRight')}</footer>`;
+    applyStyles();
     if (editing) document.querySelectorAll('[data-p]').forEach(el => { el.contentEditable = 'true'; el.spellcheck = false; });
+  }
+
+  /* ───────── Tamaño y posición de textos ───────── */
+  function applyEl(el) {
+    const st = C.style?.[el.dataset.p] || {}, s = st.s || 1;
+    el.style.zoom = s === 1 ? '' : s;
+    el.style.setProperty('--x', ((st.x || 0) / s) + 'px');
+    el.style.setProperty('--y', ((st.y || 0) / s) + 'px');
+  }
+  const applyStyles = () => document.querySelectorAll('[data-p]').forEach(applyEl);
+  const dropStyles = prefix => { if (C.style) Object.keys(C.style).forEach(k => { if (k.startsWith(prefix)) delete C.style[k]; }); };
+
+  let cur = null;
+  function placeTb() {
+    const tb = $('#tb'); if (!cur || tb.hidden) return;
+    const r = cur.getBoundingClientRect(), h = tb.offsetHeight;
+    let top = r.top - h - 8; if (top < 8) top = Math.min(r.bottom + 8, innerHeight - h - 70);
+    tb.style.top = top + 'px';
+    tb.style.left = Math.max(8, Math.min(r.left, innerWidth - tb.offsetWidth - 8)) + 'px';
+    $('#tbs').textContent = Math.round(((C.style?.[cur.dataset.p]?.s) || 1) * 100) + '%';
+  }
+  function upd(fn) {
+    const p = cur.dataset.p; C.style ||= {};
+    const st = C.style[p] ||= {}; fn(st);
+    if ((st.s ?? 1) === 1 && !st.x && !st.y) delete C.style[p];
+    dirty = true; applyEl(cur); placeTb();
   }
 
   /* ───────── Modal ───────── */
@@ -322,9 +360,9 @@
   const mv = (arr, i, d) => { const j = i + d; if (j < 0 || j >= arr.length) return; [arr[i], arr[j]] = [arr[j], arr[i]]; };
   async function act(a, i, j) {
     const W = C.work[i];
-    if (a === 'up') mv(C.work, i, -1);
-    else if (a === 'down') mv(C.work, i, 1);
-    else if (a === 'del') { if (!confirm('¿Eliminar este trabajo?')) return; C.work.splice(i, 1); }
+    if (a === 'up') { mv(C.work, i, -1); dropStyles('work.'); }
+    else if (a === 'down') { mv(C.work, i, 1); dropStyles('work.'); }
+    else if (a === 'del') { if (!confirm('¿Eliminar este trabajo?')) return; C.work.splice(i, 1); dropStyles('work.'); }
     else if (a === 'before' || a === 'after') { const p = await pickImage(a === 'before' ? 'Imagen BEFORE' : 'Imagen AFTER', W[a]); if (!p) return; W[a] = p; }
     else if (a === 'media') {
       const r = await ask({ title: 'Cambiar video', fields: [{ k: 'u', label: W.type === 'video' ? 'URL directa del archivo (.mp4)' : `Link de ${W.type === 'youtube' ? 'YouTube' : 'Vimeo'}`, ph: 'https://…' }] });
@@ -333,7 +371,7 @@
       else { const id = (W.type === 'youtube' ? ytId : vimeoId)(r.u); if (!id) return alert('No pude leer el ID del video. Pegá el link completo.'); W.videoId = id; }
     }
     else if (a === 'addtag') W.tags.push('Etiqueta');
-    else if (a === 'deltag') W.tags.splice(j, 1);
+    else if (a === 'deltag') { W.tags.splice(j, 1); dropStyles(`work.${i}.tags.`); }
     else if (a === 'addwork') {
       const r = await ask({ title: 'Nuevo trabajo', fields: [{ k: 't', type: 'select', label: 'Tipo', options: ['Before / After (fotos)', 'YouTube', 'Vimeo', 'Video por URL (.mp4)'] }] });
       if (!r) return;
@@ -344,9 +382,9 @@
       else C.work.push({ ...base, type: 'video', src: '' });
     }
     else if (a === 'addp') C.about.paragraphs.push('Nuevo párrafo.');
-    else if (a === 'delp') C.about.paragraphs.splice(i, 1);
+    else if (a === 'delp') { C.about.paragraphs.splice(i, 1); dropStyles('about.paragraphs.'); }
     else if (a === 'addsvc') C.about.services.push('Nuevo servicio');
-    else if (a === 'delsvc') C.about.services.splice(i, 1);
+    else if (a === 'delsvc') { C.about.services.splice(i, 1); dropStyles('about.services.'); }
     else if (a === 'addlink') {
       const r = await ask({ title: 'Nuevo contacto', fields: [{ k: 'l', label: 'Texto visible', ph: '@usuario' }, { k: 'h', label: 'Link', ph: 'https://… o mailto:…' }] });
       if (!r || !r.l.trim()) return; C.contact.links.push({ label: r.l.trim(), href: r.h.trim() });
@@ -355,7 +393,7 @@
       const r = await ask({ title: 'Editar link', fields: [{ k: 'h', label: 'Link', value: C.contact.links[i].href, hint: 'El texto visible se edita haciendo clic sobre él.' }] });
       if (!r) return; C.contact.links[i].href = r.h.trim();
     }
-    else if (a === 'dellink') C.contact.links.splice(i, 1);
+    else if (a === 'dellink') { C.contact.links.splice(i, 1); dropStyles('contact.links.'); }
     dirty = true; render();
   }
 
@@ -421,6 +459,23 @@
     if (b) { e.preventDefault(); act(b.dataset.act, +b.dataset.i, +b.dataset.j); return; }
     if (e.target.closest('a.contact-link, a.nav-logo')) e.preventDefault();
   });
+  const tb = $('#tb'), hm = $('#tbm'); let drag = null;
+  document.addEventListener('focusin', e => { const el = e.target.closest?.('[data-p]'); if (editing && el) { cur = el; tb.hidden = false; placeTb(); } });
+  document.addEventListener('focusout', e => { if (editing && e.target.closest?.('[data-p]')) setTimeout(() => { if (!document.activeElement?.closest?.('[data-p]')) { tb.hidden = true; cur = null; } }, 0); });
+  window.addEventListener('scroll', placeTb, { passive: true });
+  tb.addEventListener('mousedown', e => e.preventDefault());
+  tb.addEventListener('click', e => {
+    const b = e.target.closest('[data-t]'); if (!b || !cur) return;
+    upd(st => {
+      const s = st.s || 1, t = b.dataset.t;
+      if (t === 'up') st.s = Math.min(3, Math.round((s + 0.1) * 100) / 100);
+      else if (t === 'dn') st.s = Math.max(0.4, Math.round((s - 0.1) * 100) / 100);
+      else { delete st.s; delete st.x; delete st.y; }
+    });
+  });
+  hm.addEventListener('pointerdown', e => { if (!cur) return; const st = C.style?.[cur.dataset.p] || {}; drag = { x0: e.clientX, y0: e.clientY, sx: st.x || 0, sy: st.y || 0 }; hm.setPointerCapture(e.pointerId); e.preventDefault(); });
+  hm.addEventListener('pointermove', e => { if (drag) upd(st => { st.x = Math.round(drag.sx + e.clientX - drag.x0); st.y = Math.round(drag.sy + e.clientY - drag.y0); }); });
+  hm.addEventListener('pointerup', () => { drag = null; });
   window.addEventListener('beforeunload', e => { if (editing && dirty) { e.preventDefault(); e.returnValue = ''; } });
 
   load().then(async data => {
