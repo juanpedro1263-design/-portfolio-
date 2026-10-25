@@ -1,19 +1,19 @@
 {
   "site": {
-    "title": "Juan Graffigna — Color Grading",
-    "logo": "Juan Graffigna",
+    "title": "Juan Graffigna — Montaje-Color Grading",
+    "logo": "",
     "eyebrow": "Color Grading · Buenos Aires",
     "heroFirst": "Juan",
     "heroLast": "Graffigna",
     "heroSub": "Colorista independiente. Trabajo con luz, contraste y matiz para construir la atmósfera visual de cada proyecto.",
-    "scroll": "Ver trabajos",
-    "footerLeft": "© 2026 Juan Graffigna",
-    "footerRight": "Color Grading · Buenos Aires"
+    "scroll": "",
+    "footerLeft": "",
+    "footerRight": ""
   },
   "theme": {
-    "fontDisplay": "Cormorant Garamond",
-    "fontBody": "DM Mono",
-    "accent": "#c9a96e",
+    "fontDisplay": "Bodoni Moda",
+    "fontBody": "IBM Plex Mono",
+    "accent": "#e8da7d",
     "bg": "#0a0a0a",
     "text": "#e8e4de"
   },
@@ -21,40 +21,58 @@
     {
       "type": "slider",
       "title": "Proyecto Paisaje",
-      "tags": ["Foto", "Natural"],
+      "tags": [
+        "Foto",
+        "Natural"
+      ],
       "before": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
       "after": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80&sat=-100&bri=10"
     },
     {
       "type": "youtube",
       "title": "Reel 2024",
-      "tags": ["Video", "Reel"],
+      "tags": [
+        "Video",
+        "Reel"
+      ],
       "videoId": "dQw4w9WgXcQ"
     },
     {
       "type": "slider",
       "title": "Proyecto Bosque",
-      "tags": ["Foto", "Cinematográfico"],
+      "tags": [
+        "Foto",
+        "Cinematográfico"
+      ],
       "before": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
       "after": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80&sat=50"
     },
     {
       "type": "vimeo",
       "title": "Cortometraje",
-      "tags": ["Video", "Ficción"],
+      "tags": [
+        "Video",
+        "Ficción"
+      ],
       "videoId": "76979871"
     },
     {
       "type": "slider",
       "title": "Proyecto Retrato",
-      "tags": ["Foto", "Editorial"],
+      "tags": [
+        "Foto",
+        "Editorial"
+      ],
       "before": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80",
       "after": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80"
     },
     {
       "type": "video",
       "title": "Proyecto Publicidad",
-      "tags": ["Video", "Comercial"],
+      "tags": [
+        "Video",
+        "Comercial"
+      ],
       "src": ""
     }
   ],
@@ -82,9 +100,14 @@
     "t2": "de tu",
     "tEm": "proyecto",
     "links": [
-      { "label": "hola@juangraffigna.com", "href": "mailto:hola@juangraffigna.com" },
-      { "label": "@juangraffigna", "href": "https://instagram.com/juangraffigna" },
-      { "label": "LinkedIn", "href": "https://www.linkedin.com/in/juangraffigna" }
+      {
+        "label": "juanpedro1263@gmail.com",
+        "href": "mailto:hola@juangraffigna.com"
+      },
+      {
+        "label": "@Juanpegraffigna",
+        "href": "https://instagram.com/juangraffigna"
+      }
     ]
   }
 }
