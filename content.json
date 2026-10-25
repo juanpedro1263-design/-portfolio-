@@ -1,0 +1,90 @@
+{
+  "site": {
+    "title": "Juan Graffigna — Color Grading",
+    "logo": "Juan Graffigna",
+    "eyebrow": "Color Grading · Buenos Aires",
+    "heroFirst": "Juan",
+    "heroLast": "Graffigna",
+    "heroSub": "Colorista independiente. Trabajo con luz, contraste y matiz para construir la atmósfera visual de cada proyecto.",
+    "scroll": "Ver trabajos",
+    "footerLeft": "© 2026 Juan Graffigna",
+    "footerRight": "Color Grading · Buenos Aires"
+  },
+  "theme": {
+    "fontDisplay": "Cormorant Garamond",
+    "fontBody": "DM Mono",
+    "accent": "#c9a96e",
+    "bg": "#0a0a0a",
+    "text": "#e8e4de"
+  },
+  "work": [
+    {
+      "type": "slider",
+      "title": "Proyecto Paisaje",
+      "tags": ["Foto", "Natural"],
+      "before": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+      "after": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80&sat=-100&bri=10"
+    },
+    {
+      "type": "youtube",
+      "title": "Reel 2024",
+      "tags": ["Video", "Reel"],
+      "videoId": "dQw4w9WgXcQ"
+    },
+    {
+      "type": "slider",
+      "title": "Proyecto Bosque",
+      "tags": ["Foto", "Cinematográfico"],
+      "before": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+      "after": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80&sat=50"
+    },
+    {
+      "type": "vimeo",
+      "title": "Cortometraje",
+      "tags": ["Video", "Ficción"],
+      "videoId": "76979871"
+    },
+    {
+      "type": "slider",
+      "title": "Proyecto Retrato",
+      "tags": ["Foto", "Editorial"],
+      "before": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80",
+      "after": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80"
+    },
+    {
+      "type": "video",
+      "title": "Proyecto Publicidad",
+      "tags": ["Video", "Comercial"],
+      "src": ""
+    }
+  ],
+  "about": {
+    "label": "Sobre mí",
+    "t1": "Color que",
+    "tEm": "construye",
+    "t3": "narrativa",
+    "paragraphs": [
+      "Colorista independiente basado en Buenos Aires. Trabajo en proyectos de cine, publicidad y fotografía, con foco en construir una paleta coherente que sirva a la historia que se quiere contar.",
+      "Uso DaVinci Resolve como suite principal. Trabajo tanto con formatos RAW de cámara como con material ya editado.",
+      "Disponible para proyectos remotos y presenciales."
+    ],
+    "services": [
+      "Color grading para video y cine",
+      "Retoque y corrección de color en fotografía",
+      "LUT personalizadas",
+      "Color matching entre cámaras",
+      "Colaboración remota",
+      "Entrega en formatos DCP, H.264, RAW"
+    ]
+  },
+  "contact": {
+    "t1": "Hablemos",
+    "t2": "de tu",
+    "tEm": "proyecto",
+    "links": [
+      { "label": "hola@juangraffigna.com", "href": "mailto:hola@juangraffigna.com" },
+      { "label": "@juangraffigna", "href": "https://instagram.com/juangraffigna" },
+      { "label": "LinkedIn", "href": "https://www.linkedin.com/in/juangraffigna" }
+    ]
+  }
+}
